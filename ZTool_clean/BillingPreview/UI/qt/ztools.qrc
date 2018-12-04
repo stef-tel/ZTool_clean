@@ -1,0 +1,15 @@
+<RCC>
+  <qresource prefix="Buttons">
+    <file>billng.png</file>
+    <file>arrange.png</file>
+    <file>extend.png</file>
+    <file>finalize.png</file>
+    <file>bigGo.png</file>
+    <file>button_login.png</file>
+    <file>Image1.png</file>
+    <file>settings.png</file>
+    <file>arrange.png</file>
+    <file>login_username.png</file>
+    <file>smallGo.png</file>
+  </qresource>
+</RCC>
