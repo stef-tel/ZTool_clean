@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>523</width>
+    <width>1074</width>
     <height>397</height>
    </rect>
   </property>
@@ -87,7 +87,7 @@
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="ztools.qrc">:/Buttons/Image1.png</pixmap>
+            <pixmap resource="ztools.qrc">:/Buttons/images/Image1.png</pixmap>
            </property>
           </widget>
          </item>
@@ -122,7 +122,7 @@
            </property>
            <property name="icon">
             <iconset resource="ztools.qrc">
-             <normaloff>:/Buttons/settings.png</normaloff>:/Buttons/settings.png</iconset>
+             <normaloff>:/Buttons/images/settings.png</normaloff>:/Buttons/images/settings.png</iconset>
            </property>
           </widget>
          </item>
@@ -156,7 +156,7 @@
            </property>
            <property name="icon">
             <iconset resource="ztools.qrc">
-             <normaloff>:/Buttons/bigGo.png</normaloff>:/Buttons/bigGo.png</iconset>
+             <normaloff>:/Buttons/images/bigGo.png</normaloff>:/Buttons/images/bigGo.png</iconset>
            </property>
           </widget>
          </item>
@@ -203,7 +203,7 @@
            </property>
            <property name="icon">
             <iconset resource="ztools.qrc">
-             <normaloff>:/Buttons/login_username.png</normaloff>:/Buttons/login_username.png</iconset>
+             <normaloff>:/Buttons/images/login_username.png</normaloff>:/Buttons/images/login_username.png</iconset>
            </property>
           </widget>
          </item>
@@ -223,7 +223,7 @@
            </property>
            <property name="icon">
             <iconset resource="ztools.qrc">
-             <normaloff>:/Buttons/billng.png</normaloff>:/Buttons/billng.png</iconset>
+             <normaloff>:/Buttons/images/billng.png</normaloff>:/Buttons/images/billng.png</iconset>
            </property>
           </widget>
          </item>
@@ -243,7 +243,7 @@
            </property>
            <property name="icon">
             <iconset resource="ztools.qrc">
-             <normaloff>:/Buttons/extend.png</normaloff>:/Buttons/extend.png</iconset>
+             <normaloff>:/Buttons/images/extend.png</normaloff>:/Buttons/images/extend.png</iconset>
            </property>
           </widget>
          </item>
@@ -263,7 +263,7 @@
            </property>
            <property name="icon">
             <iconset resource="ztools.qrc">
-             <normaloff>:/Buttons/arrange.png</normaloff>:/Buttons/arrange.png</iconset>
+             <normaloff>:/Buttons/images/arrange.png</normaloff>:/Buttons/images/arrange.png</iconset>
            </property>
           </widget>
          </item>
@@ -283,7 +283,7 @@
            </property>
            <property name="icon">
             <iconset resource="ztools.qrc">
-             <normaloff>:/Buttons/finalize.png</normaloff>:/Buttons/finalize.png</iconset>
+             <normaloff>:/Buttons/images/finalize.png</normaloff>:/Buttons/images/finalize.png</iconset>
            </property>
           </widget>
          </item>
@@ -403,7 +403,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>523</width>
+     <width>1074</width>
      <height>18</height>
     </rect>
    </property>

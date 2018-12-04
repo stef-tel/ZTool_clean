@@ -1,15 +1,14 @@
 <RCC>
   <qresource prefix="Buttons">
-    <file>billng.png</file>
-    <file>arrange.png</file>
-    <file>extend.png</file>
-    <file>finalize.png</file>
-    <file>bigGo.png</file>
-    <file>button_login.png</file>
-    <file>Image1.png</file>
-    <file>settings.png</file>
-    <file>arrange.png</file>
-    <file>login_username.png</file>
-    <file>smallGo.png</file>
+    <file>../images/arrange.png</file>
+    <file>../images/bigGo.png</file>
+    <file>../images/billng.png</file>
+    <file>../images/button_login.png</file>
+    <file>../images/extend.png</file>
+    <file>../images/finalize.png</file>
+    <file>../images/Image1.png</file>
+    <file>../images/login_username.png</file>
+    <file>../images/settings.png</file>
+    <file>../images/smallGo.png</file>
   </qresource>
 </RCC>
