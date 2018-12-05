@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>1df22e4c-a169-4802-8429-41f2b845d0d0</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>ZTool_clean.py</StartupFile>
+    <StartupFile>BillingPreview\UI\ZToolsApp.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,15 +21,34 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BillingPreview\UI\ZToolsApp.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BillingPreview\UI\ZToolsUi.py" />
+    <Compile Include="BillingPreview\UI\ztools_rc.py" />
     <Compile Include="ZTool_clean.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="BillingPreview\UI\images\arrange.png" />
+    <Content Include="BillingPreview\UI\images\bigGo.png" />
+    <Content Include="BillingPreview\UI\images\billng.png" />
+    <Content Include="BillingPreview\UI\images\button_login.png" />
+    <Content Include="BillingPreview\UI\images\extend.png" />
+    <Content Include="BillingPreview\UI\images\finalize.png" />
+    <Content Include="BillingPreview\UI\images\Image1.png" />
+    <Content Include="BillingPreview\UI\images\login_username.png" />
+    <Content Include="BillingPreview\UI\images\settings.png" />
+    <Content Include="BillingPreview\UI\images\smallGo.png" />
+    <Content Include="BillingPreview\UI\qt\generate_qt2py.bat" />
+    <Content Include="BillingPreview\UI\qt\ztools.qrc" />
+    <Content Include="BillingPreview\UI\qt\ZTools.ui" />
     <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="BillingPreview\" />
     <Folder Include="BillingPreview\UI\" />
     <Folder Include="BillingPreview\popClasses\" />
+    <Folder Include="BillingPreview\UI\images\" />
     <Folder Include="BillingPreview\UI\qt\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
