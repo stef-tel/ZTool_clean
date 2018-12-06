@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="Buttons">
+    <file>../images/loginBig.png</file>
     <file>../images/arrange.png</file>
     <file>../images/bigGo.png</file>
     <file>../images/billng.png</file>

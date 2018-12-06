@@ -21,11 +21,21 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BillingPreview\popClasses\popBilling.py" />
+    <Compile Include="BillingPreview\popClasses\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="BillingPreview\UI\ZToolsApp.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BillingPreview\UI\ZToolsUi.py" />
     <Compile Include="BillingPreview\UI\ztools_rc.py" />
+    <Compile Include="BillingPreview\UI\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BillingPreview\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ZTool_clean.py" />
   </ItemGroup>
   <ItemGroup>
