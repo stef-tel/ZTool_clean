@@ -3,7 +3,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets  import QWidget, QApplication
+from PyQt5.QtWidgets  import QWidget, QApplication, QTableWidget,QTableWidgetItem
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from ZToolsUi import Ui_MainWindow
@@ -36,11 +36,12 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.extendButton.setEnabled(False)
         self.arrangeButton.setEnabled(False)
         self.finalizeButton.setEnabled(False)
-        #self.resultsTableView.setHeaderData(0, QtCore.Qt.Horizontal, QtCore.QVariant("a"))
+        self.resultsTableInitialize()
         
 
     def startLoginProcess(self):
         print("login")
+        self.proxyChoice = "N"
         self.wizardStackedWidget.setCurrentIndex(0)
 
     def startBillingProcess(self):
@@ -58,19 +59,40 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
     def proxySet(self):
         if self.proxySlider.value() == 0:
             self.directLabel.setStyleSheet("color:green")
-            #self.seProxyLabel.setStyleSheet("color:black")
+            self.seProxyLabel.setStyleSheet("color:black")
             self.proxyChoice = "N"
         else:
             self.directLabel.setStyleSheet("color:black")
             self.proxyChoice = "Y"
-            #self.seProxyLabel.setStyleSheet("color:green")
+            self.seProxyLabel.setStyleSheet("color:green")
 
     def loginProcess(self):
         print("start login")
-        myConnectionDetails = connectionDetails("c2bfc320-bb04-413d-8ce6-91886f7b4d9b","xnAH1Foi03IxaybnuBL1",proxy = self.proxyChoice)
+        myConnectionDetails = connectionDetails(self.userNamelineEdit.text(),self.passwordlineEdit.text(),proxy = self.proxyChoice)
         myZToken = ZToken()
         myZToken.generate(myConnectionDetails)
         print("Token is : " + myZToken.token)
+        rowPosition = self.resultTable.rowCount()
+        self.resultTable.setRowCount(rowPosition)
+        self.resultTable.insertRow(rowPosition)
+        self.resultTable.setItem(rowPosition , 0, QTableWidgetItem("Login"))
+        if myZToken.status == "Success":          
+            self.resultTable.setItem(rowPosition , 1, QTableWidgetItem("token : " + myZToken.token + "\nTenant : " + myZToken.tenant))
+            self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(myZToken.status))
+            self.loginButton.setEnabled(False)
+            self.billingButton.setEnabled(True)
+            self.extendButton.setEnabled(True)
+            self.wizardStackedWidget.setCurrentIndex(1) 
+        else:
+            self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(str(myZToken.errorMsg)))
+            self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(myZToken.status))
+        
+
+    def resultsTableInitialize(self):
+        headers = ["step", "Details (Timestamp, Name,...)", "status", "actions"]
+        self.resultTable.setColumnCount(4)
+        self.resultTable.setRowCount(0)
+        self.resultTable.setHorizontalHeaderLabels(headers)
 
 def main(args):
     app = QtWidgets.QApplication(sys.argv)

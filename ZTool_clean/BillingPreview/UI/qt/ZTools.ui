@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1074</width>
+    <width>1075</width>
     <height>442</height>
    </rect>
   </property>
@@ -30,11 +30,9 @@
     </size>
    </property>
    <property name="styleSheet">
-    <string notr="true">
-
-</string>
+    <string notr="true"/>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QGridLayout" name="gridLayout_8">
     <item row="0" column="0">
      <widget class="QFrame" name="frameHeader">
       <property name="styleSheet">
@@ -377,7 +375,7 @@ border-radius: 4px;
           <string notr="true"/>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="loginPage">
           <property name="styleSheet">
@@ -444,14 +442,14 @@ border-radius: 4px;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_7">
+                 <widget class="QLabel" name="seProxyLabel">
                   <property name="text">
                    <string>Use SE Proxy</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <spacer name="seProxyLabel">
+                 <spacer name="horizontalSpacer_10">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
@@ -575,21 +573,145 @@ border-radius: 4px;
          </widget>
          <widget class="QWidget" name="billingPage">
           <property name="styleSheet">
-           <string notr="true">background:yellow</string>
+           <string notr="true"/>
           </property>
-          <widget class="QLabel" name="label_4">
-           <property name="geometry">
-            <rect>
-             <x>50</x>
-             <y>30</y>
-             <width>35</width>
-             <height>10</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Page 2</string>
-           </property>
-          </widget>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <layout class="QFormLayout" name="formLayout">
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
+               <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Target Date</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateEdit" name="dateEdit">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="calendarPopup">
+                  <bool>true</bool>
+                 </property>
+                 <property name="date">
+                  <date>
+                   <year>2018</year>
+                   <month>12</month>
+                   <day>7</day>
+                  </date>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item>
+                <widget class="QLabel" name="label_3">
+                 <property name="text">
+                  <string>Invoice date</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateEdit" name="dateEdit_2">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="calendarPopup">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item row="0" column="1">
+            <layout class="QFormLayout" name="formLayout_2">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Batch</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="comboBox">
+               <item>
+                <property name="text">
+                 <string>Batch 1</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Batch 2</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Batch 3</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Batch 4</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Batch 4</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <item>
+                <widget class="QLabel" name="label_7">
+                 <property name="text">
+                  <string>Filters</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox">
+                 <property name="text">
+                  <string>One Time</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_12">
+                 <item>
+                  <widget class="QCheckBox" name="checkBox_2">
+                   <property name="text">
+                    <string>Recurring</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkBox_3">
+                   <property name="text">
+                    <string>Usage</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </widget>
          <widget class="QWidget" name="welcomePage">
           <widget class="QLabel" name="label">
@@ -613,6 +735,9 @@ border-radius: 4px;
     </item>
     <item row="2" column="0">
      <widget class="QFrame" name="frameResult">
+      <property name="styleSheet">
+       <string notr="true">background:white</string>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -621,7 +746,23 @@ border-radius: 4px;
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="0" column="0">
-        <widget class="QTableView" name="resultsTableView"/>
+        <widget class="QTableWidget" name="resultTable">
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="tabKeyNavigation">
+          <bool>false</bool>
+         </property>
+         <property name="showDropIndicator" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="dragDropOverwriteMode">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -633,7 +774,7 @@ border-radius: 4px;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1074</width>
+     <width>1075</width>
      <height>18</height>
     </rect>
    </property>

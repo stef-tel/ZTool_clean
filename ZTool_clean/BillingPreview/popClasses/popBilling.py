@@ -73,9 +73,13 @@ class ZToken:
         response = requests.request("POST", uri, data=payload, headers=headers, proxies=connectionDetails.proxies, timeout=5, verify=connectionDetails.verify)
     except requests.exceptions.Timeout:
         print("Connection failed : Time Out. Try with another proxy choice (Y/N).")
+        self.status = "Failure"
+        self.errorMsg = "Connection failed : Time Out. Try with another proxy choice."
         return
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         print(e)
+        self.status = "Failure"
+        self.errorMsg = e
         return
 
     self.status = str(response.status_code)
@@ -88,9 +92,11 @@ class ZToken:
             self.tenant = self.tenant[index+8 : index+12]
         else:
             self.tenant = "not found"
+        self.status = "Success"
         print("tenant : " + self.tenant)
     else:
         self.errorMsg = "HTTP ERROR - error code = : " + str(response.status_code) + " while creating auth. token"
+        self.status = "Failure"
         print(self.errorMsg)
         return
 
