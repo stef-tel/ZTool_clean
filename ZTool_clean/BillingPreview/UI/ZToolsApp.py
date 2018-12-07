@@ -24,7 +24,8 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.startButton.clicked.connect(self.startNewProcess)
         self.loginButton.clicked.connect(self.startLoginProcess)
         self.billingButton.clicked.connect(self.startBillingProcess)
-        self.modeChoiceHorizontalSlider.valueChanged.connect(self.modeLabelsColorSet)
+        self.modeChoiceHorizontalSlider.valueChanged.connect(self.modeSet)
+        self.proxySlider.valueChanged.connect(self.proxySet)
         self.commandLinkButton.clicked.connect(self.loginProcess)
 
     def startNewProcess(self):
@@ -35,6 +36,8 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.extendButton.setEnabled(False)
         self.arrangeButton.setEnabled(False)
         self.finalizeButton.setEnabled(False)
+        #self.resultsTableView.setHeaderData(0, QtCore.Qt.Horizontal, QtCore.QVariant("a"))
+        
 
     def startLoginProcess(self):
         print("login")
@@ -44,7 +47,7 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
         print("login")
         self.wizardStackedWidget.setCurrentIndex(1)   
 
-    def modeLabelsColorSet(self):
+    def modeSet(self):
         if self.modeChoiceHorizontalSlider.value() == 0:
             self.AllInOneLabel.setStyleSheet("color:green")
             self.stepBystepLabel.setStyleSheet("color:black")
@@ -52,9 +55,19 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.AllInOneLabel.setStyleSheet("color:black")
             self.stepBystepLabel.setStyleSheet("color:green")
 
+    def proxySet(self):
+        if self.proxySlider.value() == 0:
+            self.directLabel.setStyleSheet("color:green")
+            #self.seProxyLabel.setStyleSheet("color:black")
+            self.proxyChoice = "N"
+        else:
+            self.directLabel.setStyleSheet("color:black")
+            self.proxyChoice = "Y"
+            #self.seProxyLabel.setStyleSheet("color:green")
+
     def loginProcess(self):
         print("start login")
-        myConnectionDetails = connectionDetails("c2bfc320-bb04-413d-8ce6-91886f7b4d9b","xnAH1Foi03IxaybnuBL1",proxy = 'N')
+        myConnectionDetails = connectionDetails("c2bfc320-bb04-413d-8ce6-91886f7b4d9b","xnAH1Foi03IxaybnuBL1",proxy = self.proxyChoice)
         myZToken = ZToken()
         myZToken.generate(myConnectionDetails)
         print("Token is : " + myZToken.token)
