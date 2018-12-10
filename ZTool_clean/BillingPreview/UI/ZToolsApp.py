@@ -11,6 +11,8 @@ import ztools_rc
 
 from popClasses.popBilling import connectionDetails, ZToken, ZFile
 
+from datetime import datetime
+
 class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(ZToolsApp, self).__init__(parent=parent)
@@ -82,7 +84,11 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.loginButton.setEnabled(False)
             self.billingButton.setEnabled(True)
             self.extendButton.setEnabled(True)
-            self.wizardStackedWidget.setCurrentIndex(1) 
+            self.wizardStackedWidget.setCurrentIndex(1)
+            currentDate = QDate.currentDate()
+            self.billingTargetDateEdit.setDate(currentDate)
+            self.invoiceDateDateEdit.setDate(currentDate)
+             
         else:
             self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(str(myZToken.errorMsg)))
             self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(myZToken.status))
