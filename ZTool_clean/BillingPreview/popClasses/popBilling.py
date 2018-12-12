@@ -129,7 +129,7 @@ class ZFile:
         self.idName = "Id"
         self.status = "Status"
 
-  def generate(self, connectionDetails, myZToken):
+  def generate(self, connectionDetails, ZToken):
     #launch Zuora job. There are 2 types for the moment : BillingPreviewRun and DataSourceExport
     
     if self.type == "BillingPreviewRun":
@@ -140,9 +140,9 @@ class ZFile:
         uri = connectionDetails.url + "/v1/object/export"
 
     headers = {
-                'Content-Type': "application/json",
-                'Authorization': "Bearer " + myZToken.value,
-                'cache-control': "no-cache"
+                 "Content-Type": "application/json",
+                #"Authorization": "Bearer " + ZToken.value,
+                "cache-control": "no-cache"
                 }
 
     try :

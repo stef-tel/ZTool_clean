@@ -375,7 +375,7 @@ border-radius: 4px;
           <string notr="true"/>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="loginPage">
           <property name="styleSheet">
@@ -666,7 +666,7 @@ border-radius: 4px;
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QComboBox" name="comboBox">
+                 <widget class="QComboBox" name="batchComboBox">
                   <item>
                    <property name="text">
                     <string>Batch 1</string>
@@ -704,7 +704,7 @@ border-radius: 4px;
                    </widget>
                   </item>
                   <item>
-                   <widget class="QCheckBox" name="checkBox">
+                   <widget class="QCheckBox" name="onetimeCheckBox">
                     <property name="text">
                      <string>One Time</string>
                     </property>
@@ -713,14 +713,14 @@ border-radius: 4px;
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_12">
                     <item>
-                     <widget class="QCheckBox" name="checkBox_2">
+                     <widget class="QCheckBox" name="recurringCheckBox">
                       <property name="text">
                        <string>Recurring</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="checkBox_3">
+                     <widget class="QCheckBox" name="usageCheckBox">
                       <property name="text">
                        <string>Usage</string>
                       </property>
@@ -745,9 +745,19 @@ border-radius: 4px;
              </property>
              <layout class="QGridLayout" name="gridLayout">
               <item row="0" column="0">
-               <widget class="QCommandLinkButton" name="commandLinkButton_2">
+               <widget class="QCommandLinkButton" name="launchBillingCommandLinkButton">
                 <property name="text">
-                 <string>CommandLinkButton</string>
+                 <string>Launch Billing Preview</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="ztools.qrc">
+                  <normaloff>:/Buttons/images/billingLaunch.png</normaloff>:/Buttons/images/billingLaunch.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>40</width>
+                  <height>40</height>
+                 </size>
                 </property>
                </widget>
               </item>

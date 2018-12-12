@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="Buttons">
+    <file>../images/lifeIsOn_black.jpg</file>
     <file>../images/loginBig.png</file>
     <file>../images/billingLaunch.png</file>
     <file>../images/arrange.png</file>
