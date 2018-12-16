@@ -50,6 +50,7 @@
     <Content Include="BillingPreview\UI\images\settings.png" />
     <Content Include="BillingPreview\UI\images\smallGo.png" />
     <Content Include="BillingPreview\UI\qt\generate_qt2py.bat" />
+    <Content Include="BillingPreview\UI\qt\generate_qt2pyRC.bat" />
     <Content Include="BillingPreview\UI\qt\ztools.qrc" />
     <Content Include="BillingPreview\UI\qt\ZTools.ui" />
     <Content Include="requirements.txt" />

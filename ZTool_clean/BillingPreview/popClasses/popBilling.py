@@ -55,7 +55,7 @@ class ZToken:
   def __init__(self):
     self.status = "empty"
     self.tenant = "empty"
-    self.errorMsg = "empty"
+    self.statusMsg = "empty"
     self.token = "empty"
     
 
@@ -74,12 +74,12 @@ class ZToken:
     except requests.exceptions.Timeout:
         print("Connection failed : Time Out. Try with another proxy choice (Y/N).")
         self.status = "Failure"
-        self.errorMsg = "Connection failed : Time Out. Try with another proxy choice."
+        self.statusMsg = "Connection failed : Time Out. Try with another proxy choice."
         return
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         print(e)
         self.status = "Failure"
-        self.errorMsg = e
+        self.statusMsg = e
         return
 
     self.status = str(response.status_code)
@@ -94,8 +94,9 @@ class ZToken:
             self.tenant = "not found"
         self.status = "Success"
         print("tenant : " + self.tenant)
+        self.statusMsg = "you're connected to tenant " + self.tenant
     else:
-        self.errorMsg = "HTTP ERROR - error code = : " + str(response.status_code) + " while creating auth. token"
+        self.statusMsg = "HTTP ERROR - error code = : " + str(response.status_code) + " while creating auth. token"
         self.status = "Failure"
         print(self.errorMsg)
         return
@@ -112,28 +113,32 @@ class ZToken:
 
 class ZFile:
   def __init__(self, Type):
-    self.status = "empty"
+    self.statusName = "empty"
     self.fileUrl = "empty"
     self.type = Type
     self.value = "empty"
     self.runId = "emtpy"
     self.path = "empty"
     self.fileName = "empty"
+    self.statusMsg = "empty"
+    self.status = "empty"
 
     if self.type == "BillingPreviewRun":
-        self.success = "success"
+        self.successName = "success"
         self.idName = "billingPreviewRunId"
-        self.status = "status"
+        self.statusName = "status"
     else:
-        self.success = "Success"
+        self.successName = "Success"
         self.idName = "Id"
-        self.status = "Status"
+        self.statusName = "Status"
 
-  def generate(self, connectionDetails, ZToken):
+  def generate(self, connectionDetails, ZToken, chargeTypeToExclude, batch, targetDate, invoiceDate):
     #launch Zuora job. There are 2 types for the moment : BillingPreviewRun and DataSourceExport
-    
     if self.type == "BillingPreviewRun":
-        payload = "{\r\n\"assumeRenewal\": \"None\",\r\n\"batch\": \"\",\r\n\"chargeTypeToExclude\": \"\",\r\n\"includingEvergreenSubscription\": \"true\",\r\n\"targetDate\": \"2019-05-1\"\r\n}"
+        payload = "{\r\n\"assumeRenewal\": \"None\",\r\n\"batch\": \"" + batch + "\",\r\n\"chargeTypeToExclude\": \"" + chargeTypeToExclude + "\",\r\n\"includingEvergreenSubscription\": \"true\",\r\n\"targetDate\": \"2019-05-1\"\r\n}"
+        payload = "{\r\n\"assumeRenewal\": \"None\",\r\n\"batch\": \"" + batch + "\",\r\n\"chargeTypeToExclude\": \"" + chargeTypeToExclude + "\",\r\n\"includingEvergreenSubscription\": \"true\",\r\n\"targetDate\": \"" + targetDate + "\"\r\n}"
+        #payload = "{\r\n\"assumeRenewal\": \"None\",\r\n\"batch\": \"Batch 3\",\r\n\"chargeTypeToExclude\": \"OneTime,Usage\",\r\n\"includingEvergreenSubscription\": \"true\",\r\n\"targetDate\": \"2017-01-10\"\r\n\"invoiceDate\":\"2017-01-10\"\r\n}"
+        #payload = "{\r\n\"assumeRenewal\": \"None\",\r\n\"batch\": \"Batch 3\",\r\n\"chargeTypeToExclude\": \"OneTime,Usage\",\r\n\"includingEvergreenSubscription\": \"true\",\r\n\"targetDate\": \"2017-01-10\"\r\n\"invoiceDate\":\"2017-01-10\"\r\n}"       
         uri = connectionDetails.url + "/v1/billing-preview-runs"
     else:
         payload = "{\r\n\"Format\": \"csv\",\r\n\"Name\": \"test_Export_1476935164445\",\r\n\"Query\": \"select Subscription.Id, Subscription.Name, Subscription.CostType__c, Subscription.CostTypeValue__c, Subscription.Entity__c, Subscription.Status, Subscription.SubscriptionEndDate, Subscription.TermType, Account.AccountNumber, Account.BillCycleDay, Account.Batch, Account.CompanyCode__c, Account.Currency, Account.CustomerCompanyName__c, Account.FreeTextAttribute1__c, Account.FreeTextAttribute1__c, Account.SEAccountID__c, Account.Status, BillToContact.City, BillToContact.Country from subscription where Subscription.Entity__c = 'EBA' and Subscription.Status = 'Active'\",\r\n\"Zip\": false\r\n}"
@@ -141,43 +146,40 @@ class ZFile:
 
     headers = {
                  "Content-Type": "application/json",
-                #"Authorization": "Bearer " + ZToken.value,
+                 "Authorization": "Bearer " + str(ZToken.token),
                 "cache-control": "no-cache"
                 }
+    #headers["Authorization"] = " Bearer " + str(ZToken.token)
 
     try :
         response = requests.request("POST", uri, data=payload, headers=headers, proxies=connectionDetails.proxies, timeout=5, verify=connectionDetails.verify)
     except requests.exceptions.Timeout:
         print("Connection failed : Time Out. Try with another proxy choice (Y/N).")
-        self.value = "ERROR"
+        self.status = "ERROR"
+        self.statusMsg = "Connection failed : Time Out. Try with another proxy choice (Y/N)."
         return
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         print(e)
-        self.value = "ERROR"
+        self.status = "ERROR"
+        self.statusMsg = str(e)
         return
 
     if response.status_code == 200:
         parsed_json = json.loads(response.text)
-        
-        #if self.type == "BillingPreviewRun":
-        #    success = "success"
-        #    idName = "billingPreviewRunId"
-        #    status = "Status"
-        #else:
-        #    success = "Success"
-        #    idName = "Id"
-        #    status = "status"
 
-        if parsed_json[self.success] == True:
+        if parsed_json[self.successName] == True:
             self.runId = parsed_json[self.idName]
-            self.value = "SUCCESS"
+            self.status = "SUCCESS"
+            self.statusMsg = "Billing Run Preview Id = " + parsed_json[self.idName]
         else :
-            self.value = parsed_json['reasons.message']
+            self.statusMsg = parsed_json['reasons'][0]['message']
+            self.status = "Failure"
 
     else:
-        self.value = response.status_code
-        print("something went wrong : " + self.value)
-        return
+        self.statusMsg = response.status_code
+        self.status = "Failure"
+        print("something went wrong : " + str(self.value))
+        #return
 
   def retrieve(self, connectionDetails, runId, myZToken, maxTry):
         
@@ -188,10 +190,10 @@ class ZFile:
             uri = connectionDetails.url + "/v1/object/export/" + self.runId
 
         headers = {
-                    'Content-Type': "application/json",
-                    'Authorization': "Bearer " + myZToken.value,
-                    'cache-control': "no-cache"
-                    }    
+                    "Content-Type": "application/json",
+                    "cache-control": "no-cache"
+                    }
+        headers["Authorization"] = " Bearer " + str(myZToken.token)
         
         retry = True
         numberTry = 0
@@ -211,7 +213,7 @@ class ZFile:
             if response.status_code == 200:
                 parsed_json = json.loads(response.text)
                 
-                if parsed_json[self.status] == "Completed":
+                if parsed_json[self.statusName] == "Completed":
                     
                     if self.type == "BillingPreviewRun":    
                         self.fileUrl = parsed_json['resultFileUrl']

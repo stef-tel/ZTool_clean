@@ -86,13 +86,9 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.myZToken = ZToken()
         self.myZToken.generate(self.myConnectionDetails)
         print("Token is : " + self.myZToken.token)
-        rowPosition = self.resultTable.rowCount()
-        self.resultTable.setRowCount(rowPosition)
-        self.resultTable.insertRow(rowPosition)
-        self.resultTable.setItem(rowPosition , 0, QTableWidgetItem("Login"))
         if self.myZToken.status == "Success":          
-            self.resultTable.setItem(rowPosition , 1, QTableWidgetItem("token : " + self.myZToken.token + "\nTenant : " + self.myZToken.tenant))
-            self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(self.myZToken.status))
+            #self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(self.myZToken.statusMsg)
+            #self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(self.myZToken.status))
             self.loginButton.setEnabled(False)
             self.billingButton.setEnabled(True)
             self.extendButton.setEnabled(True)
@@ -101,11 +97,16 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.billingTargetDateEdit.setDate(currentDate)
             self.invoiceDateDateEdit.setDate(currentDate)
              
-        else:
-            self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(str(self.myZToken.errorMsg)))
-            self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(self.myZToken.status))
+        #else:
+        #    self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(self.myZToken.statusMsg))
+        #    self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(self.myZToken.status))
+        rowPosition = self.resultTable.rowCount()
+        self.resultTable.setRowCount(rowPosition)
+        self.resultTable.insertRow(rowPosition)
+        self.resultTable.setItem(rowPosition , 0, QTableWidgetItem("Login"))
+        self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(str(self.myZToken.statusMsg)))
+        self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(self.myZToken.status))
         
-
     def resultsTableInitialize(self):
         headers = ["step", "Details (Timestamp, Name,...)", "status", "actions"]
         self.resultTable.setColumnCount(4)
@@ -117,22 +118,53 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def launchBillingProcess(self):
         print("still under construction !")
-        #rowPosition = self.resultTable.rowCount()
-        #self.resultTable.setRowCount(rowPosition)
-        #self.resultTable.insertRow(rowPosition)
-        #self.resultTable.setItem(rowPosition , 0, QTableWidgetItem("Billing Preview"))
-        #myZbillingPreviewRun = ZFile("BillingPreviewRun")
-        #myZbillingPreviewRun.generate(self.myConnectionDetails, self.myZToken)
-        #if myZbillingPreviewRun.value == "SUCCESS" :
-        #    print("Billing Run Id : " + myZbillingPreviewRun.runId)
-        #    myZbillingPreviewRun.value == "Started"            
-        #    self.resultTable.setItem(rowPosition , 1, QTableWidgetItem("Billing Run Id : " + myZbillingPreviewRun.runId))
-        #    self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(myZbillingPreviewRun.value))
-        #    myZbillingPreviewRun.retrieve(myConnectionDetails, myZbillingPreviewRun.runId, myZToken, 100)
-        #else:
-        #    myZbillingPreviewRun.value == "Launch failed"
-        #    self.resultTable.setItem(rowPosition , 1, QTableWidgetItem("coucou"))
-        #    self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(myZbillingPreviewRun.value))
+        #get job details
+        targetDate = self.billingTargetDateEdit.date().toString("yyyy-MM-dd")
+        invoiceDate = self.invoiceDateDateEdit.date()
+        batch = self.batchComboBox.currentText()
+        chargeTypeToExclude = ""
+
+        if self.onetimeCheckBox.isChecked() and self.recurringCheckBox.isChecked() and self.usageCheckBox.isChecked():
+            QMessageBox.warning(self, "Wrong parameters", "You could not filter all charges type.")
+            return
+
+        if self.onetimeCheckBox.isChecked():
+            chargeTypeToExclude = chargeTypeToExclude + "OneTime"
+        if self.recurringCheckBox.isChecked():
+            if chargeTypeToExclude == "":
+                chargeTypeToExclude = chargeTypeToExclude + "Recurring"
+            else:
+                chargeTypeToExclude = chargeTypeToExclude + ",Recurring"
+        if self.usageCheckBox.isChecked():
+            if chargeTypeToExclude == "":
+                chargeTypeToExclude = chargeTypeToExclude + "Usage"
+            else:
+                chargeTypeToExclude = chargeTypeToExclude + ",Usage" 
+
+        #launch Zuora job
+        myZbillingPreviewRun = ZFile("BillingPreviewRun")
+        myZbillingPreviewRun.generate(self.myConnectionDetails, self.myZToken, chargeTypeToExclude, batch, targetDate, invoiceDate)
+        if myZbillingPreviewRun.status == "SUCCESS" :
+            print("Billing Run Id : " + myZbillingPreviewRun.runId)
+            myZbillingPreviewRun.value == "Started"            
+            #myZbillingPreviewRun.retrieve(myConnectionDetails, myZbillingPreviewRun.runId, myZToken, 100)
+        else:
+            myZbillingPreviewRun.value == "Launch failed"
+        
+        rowPosition = self.resultTable.rowCount()
+        self.resultTable.setRowCount(rowPosition)
+        self.resultTable.insertRow(rowPosition)
+        self.resultTable.setItem(rowPosition , 0, QTableWidgetItem("Billing Preview"))
+        self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(myZbillingPreviewRun.statusMsg))
+        self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(myZbillingPreviewRun.status))
+
+        #poll Zuora job to get once completed
+        if myZbillingPreviewRun.status == "SUCCESS" :
+            return
+            #myZbillingPreviewRun.retrieve(myConnectionDetails, myZbillingPreviewRun.runId, myZToken, 100)
+        else:
+            return 
+        
 
 def main(args):
 
