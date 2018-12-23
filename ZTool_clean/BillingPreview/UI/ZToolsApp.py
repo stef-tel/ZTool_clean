@@ -9,7 +9,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from ZToolsUi import Ui_MainWindow
 import ztools_rc
 
-from popClasses.popBilling import connectionDetails, ZToken, ZFile
+from popClasses.popBilling import connectionDetails, ZToken, ZFile, pzSettings
 
 from datetime import datetime
 
@@ -33,15 +33,24 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.proxySlider.valueChanged.connect(self.proxySet)
         self.commandLinkButton.clicked.connect(self.loginProcess)
         self.launchBillingCommandLinkButton.clicked.connect(self.launchBillingProcess)
+        self.resultTable.doubleClicked.connect(self.launchAction)
 
     def startNewProcess(self):
         print("enfin")
-        
+  
+        self.currentSettings = pzSettings()
+        if self.currentSettings.checkOK == False:
+            print("something went wrong while loading settings")
+            QMessageBox.critical(self, 'Loading Settings', "Something went wrong")    
+            return  
+      
         if self.firstLaunch == False:
             buttonReply = QMessageBox.question(self, 'Re start Process', "Are you sure ?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if buttonReply == QMessageBox.No:
                 return
             
+ 
+
         self.wizardStackedWidget.setCurrentIndex(2)
         self.loginButton.setEnabled(True)
         self.billingButton.setEnabled(False)
@@ -86,9 +95,8 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
         self.myZToken = ZToken()
         self.myZToken.generate(self.myConnectionDetails)
         print("Token is : " + self.myZToken.token)
+
         if self.myZToken.status == "Success":          
-            #self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(self.myZToken.statusMsg)
-            #self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(self.myZToken.status))
             self.loginButton.setEnabled(False)
             self.billingButton.setEnabled(True)
             self.extendButton.setEnabled(True)
@@ -97,20 +105,13 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
             self.billingTargetDateEdit.setDate(currentDate)
             self.invoiceDateDateEdit.setDate(currentDate)
              
-        #else:
-        #    self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(self.myZToken.statusMsg))
-        #    self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(self.myZToken.status))
-        rowPosition = self.resultTable.rowCount()
-        self.resultTable.setRowCount(rowPosition)
-        self.resultTable.insertRow(rowPosition)
-        self.resultTable.setItem(rowPosition , 0, QTableWidgetItem("Login"))
-        self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(str(self.myZToken.statusMsg)))
-        self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(self.myZToken.status))
+        self.addRecord("Login",self.myZToken.status,self.myZToken.statusMsg)
         
     def resultsTableInitialize(self):
-        headers = ["step", "Details (Timestamp, Name,...)", "status", "actions"]
-        self.resultTable.setColumnCount(4)
+        headers = ["step", "Details (Timestamp, Name,...)", "status", "actions","key"]
+        self.resultTable.setColumnCount(5)
         self.resultTable.setRowCount(0)
+        self.resultTable.setColumnHidden(4, True)
         self.resultTable.setHorizontalHeaderLabels(headers)
         header = self.resultTable.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
@@ -127,6 +128,8 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.onetimeCheckBox.isChecked() and self.recurringCheckBox.isChecked() and self.usageCheckBox.isChecked():
             QMessageBox.warning(self, "Wrong parameters", "You could not filter all charges type.")
             return
+        
+        self.billingPreviewProgressBar.setValue(0)
 
         if self.onetimeCheckBox.isChecked():
             chargeTypeToExclude = chargeTypeToExclude + "OneTime"
@@ -147,24 +150,79 @@ class ZToolsApp(QtWidgets.QMainWindow, Ui_MainWindow):
         if myZbillingPreviewRun.status == "SUCCESS" :
             print("Billing Run Id : " + myZbillingPreviewRun.runId)
             myZbillingPreviewRun.value == "Started"            
-            #myZbillingPreviewRun.retrieve(myConnectionDetails, myZbillingPreviewRun.runId, myZToken, 100)
+            self.billingPreviewProgressBar.setValue(25)
+            self.stepLabel.setText("job successfully launched")
+            QCoreApplication.processEvents()
+            goNextStep = True
         else:
             myZbillingPreviewRun.value == "Launch failed"
         
+        self.addRecord("Billing Preview",myZbillingPreviewRun.status,myZbillingPreviewRun.statusMsg)
+
+
+        #poll Zuora job to get once completed
+        if goNextStep == True :
+            numberTry = 1
+            progress = 25
+         
+            while myZbillingPreviewRun.retry == True:
+                self.stepLabel.setText("Polling (#" + str(numberTry) + ") - current status : " + myZbillingPreviewRun.status)
+                numberTry += 1
+                rest = 50 - progress
+                progress =  progress + int(rest * 0.4)
+                myZbillingPreviewRun.retrieve(self.myConnectionDetails, myZbillingPreviewRun.runId, self.myZToken, 1)
+                self.billingPreviewProgressBar.setValue(progress)
+                QCoreApplication.processEvents()
+            
+            self.billingPreviewProgressBar.setValue(50)
+            QCoreApplication.processEvents()
+            
+            if myZbillingPreviewRun.status == "Completed":
+                print("coucou")
+                self.addRecord("Billing Preview","Result File known",myZbillingPreviewRun.statusMsg)
+
+                goNextStep = True
+
+        else:
+            return
+
+        if goNextStep == True : 
+            print("")
+            myZbillingPreviewRun.download(self.myConnectionDetails, myZbillingPreviewRun.fileUrl,self.currentSettings.tempFolderPath)
+            self.stepLabel.setText("job completed, ZIP downloaded")
+            self.billingPreviewProgressBar.setValue(75)
+            self.addRecord("Billing Preview",myZbillingPreviewRun.status,myZbillingPreviewRun.statusMsg)
+
+            if myZbillingPreviewRun.status == "ERROR":
+                return
+            myZbillingPreviewRun.unzip(self.currentSettings.resultsFolderPath)
+            self.stepLabel.setText("job completed, CSV file extracted")
+            self.billingPreviewProgressBar.setValue(100)
+            self.addRecord("Billing Preview",myZbillingPreviewRun.status,myZbillingPreviewRun.statusMsg,"openCSV", myZbillingPreviewRun.csvName)
+
+            
+    def launchAction(self) :
+        #selectedRow = self.resultTable.SelectRows
+        #selectedColumn = self.resultTable.SelectColumns
+        item = self.resultTable.selectedItems()[0]
+        selectedColumn = item.column()
+        selectedRow = item.row()
+        if selectedColumn == 3:
+            if item.text() == "openCSV" :    
+                print(item.text())
+                csvName = self.resultTable.item(int(selectedRow), 4).text()
+                openCsvString = "start EXCEL.EXE " + self.currentSettings.resultsFolderPath + "/" + csvName
+                os.system(openCsvString)
+
+    def addRecord(self,step,status,statusMsg, action='None', key='None'):
         rowPosition = self.resultTable.rowCount()
         self.resultTable.setRowCount(rowPosition)
         self.resultTable.insertRow(rowPosition)
-        self.resultTable.setItem(rowPosition , 0, QTableWidgetItem("Billing Preview"))
-        self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(myZbillingPreviewRun.statusMsg))
-        self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(myZbillingPreviewRun.status))
-
-        #poll Zuora job to get once completed
-        if myZbillingPreviewRun.status == "SUCCESS" :
-            return
-            #myZbillingPreviewRun.retrieve(myConnectionDetails, myZbillingPreviewRun.runId, myZToken, 100)
-        else:
-            return 
-        
+        self.resultTable.setItem(rowPosition , 0, QTableWidgetItem(step))
+        self.resultTable.setItem(rowPosition , 1, QTableWidgetItem(statusMsg))
+        self.resultTable.setItem(rowPosition , 2, QTableWidgetItem(status))
+        self.resultTable.setItem(rowPosition , 3, QTableWidgetItem(action))
+        self.resultTable.setItem(rowPosition , 4, QTableWidgetItem(key))
 
 def main(args):
 
@@ -184,7 +242,10 @@ def main(args):
     progressBar.setGeometry(0, splash_pix.height() - 50, splash_pix.width(), 20)
     splash.show()
 
+    #progressBar.setValue(50)
+    #app.processEvents()
     for i in range(1, 50):
+
         progressBar.setValue(i)
         t = time.time()
         while time.time() < t + 0.1:

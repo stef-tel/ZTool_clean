@@ -7,6 +7,7 @@ import shutil
 import datetime
 import zipfile
 import os
+from pathlib import Path
 
 #**************** CLASS *****************
 #            connectionDetails
@@ -42,6 +43,8 @@ class connectionDetails:
     else :
         self.verify = False
         self.proxies = {}
+
+
 
 #**************** END CLASS *****************
 #            connectionDetails
@@ -98,7 +101,7 @@ class ZToken:
     else:
         self.statusMsg = "HTTP ERROR - error code = : " + str(response.status_code) + " while creating auth. token"
         self.status = "Failure"
-        print(self.errorMsg)
+        print(self.statusMsg)
         return
 
 #**************** END CLASS *****************
@@ -122,6 +125,7 @@ class ZFile:
     self.fileName = "empty"
     self.statusMsg = "empty"
     self.status = "empty"
+    self.retry = True
 
     if self.type == "BillingPreviewRun":
         self.successName = "success"
@@ -191,23 +195,25 @@ class ZFile:
 
         headers = {
                     "Content-Type": "application/json",
+                    "Authorization": "Bearer " + str(myZToken.token),
                     "cache-control": "no-cache"
                     }
-        headers["Authorization"] = " Bearer " + str(myZToken.token)
         
-        retry = True
-        numberTry = 0
-        while retry == True and numberTry <= maxTry :
+        self.retry = True
+        numberTry = 1
+        while self.retry == True and numberTry <= maxTry :
             numberTry += 1
             try :
                 response = requests.request("GET", uri, headers=headers, proxies=connectionDetails.proxies, timeout=5, verify=connectionDetails.verify)
             except requests.exceptions.Timeout:
                 print("Connection failed : Time Out. Try with another proxy choice (Y/N).")
-                self.value = "ERROR"
+                self.status = "ERROR"
+                self.retry = False
                 return
             except requests.exceptions.RequestException as e:  # This is the correct syntax
                 print(e)
-                self.value = "ERROR"
+                self.status = "ERROR"
+                self.retry = False
                 return
         
             if response.status_code == 200:
@@ -220,27 +226,28 @@ class ZFile:
                     else :
                         self.fileUrl = connectionDetails.url + "/v1/files/" + parsed_json['FileId']
 
-                    self.value = parsed_json[self.status]
-                    retry = False
+                    self.status = parsed_json[self.statusName]
+                    self.statusMsg = "Result File Url : " + self.fileUrl
+                    self.retry = False
                     return
 
-                elif parsed_json[self.status] == "Error":
-                    self.value = parsed_json[self.status]
-                    print("something went wrong during integrate: " + str(self.value))
-                    retry = False
+                elif parsed_json[self.statusName] == "Error":
+                    self.status = parsed_json[self.statusName]
+                    print("something went wrong during integrate: " + str(self.status))
+                    self.retry = False
                     return
                 else :
-                    self.value = parsed_json[self.status]
+                    self.status = parsed_json[self.statusName]
                     print("Status : " + self.value + " - Number Try : " + str(numberTry) + "   ", end="", flush=True)
                     for x in range(3):    
                         time.sleep(1)
                         print("____", end="", flush=True)
                     print("____")
             else:
-                self.value = response.status_code
+                self.status = response.status_code
                 print()
                 print("something went wrong during integrate: " + str(self.value))
-                retry = False
+                self.retry = False
                 return
 
   def download(self, connectionDetails, fileUrl,dirPath):
@@ -249,11 +256,13 @@ class ZFile:
         response = requests.get(fileUrl, auth=(connectionDetails.userName, connectionDetails.password), proxies=connectionDetails.proxies, timeout=5, verify=connectionDetails.verify, stream=True)
     except requests.exceptions.Timeout:
         print("Connection failed : Time Out. Try with another proxy choice (Y/N).")
-        self.value = "ERROR"
+        self.status = "ERROR"
+        self.statusMsg = "Error while downlaoding file"  + fileUrl + " - time Out"
         return
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         print(e)
-        self.value = "ERROR"
+        self.status = "ERROR"
+        self.statusMsg = "Error while downlaoding file"  + fileUrl + " - " + e
         return
 
     if response.status_code == 200:
@@ -265,10 +274,12 @@ class ZFile:
             shutil.copyfileobj(response.raw, outFile)
             self.path = dirPath
             self.fileName = 'test_' + myTimeStamp + '.zip'
-            self.value = "DOWNLOADED"
+            self.status = "DOWNLOADED"
+            self.statusMsg = "Temp File Name : " + self.fileName
     else:
-        self.value = response.status_code
-        print("something went wrong : " + self.value)
+        self.status = response.status_code
+        self.statusMsg = "something went wrong : " + self.status
+        print("something went wrong : " + self.status)
         return
 
   def downloadCsv(self, connectionDetails, myZToken, fileUrl,dirPath):
@@ -307,14 +318,21 @@ class ZFile:
 
   def unzip(self, targetPath):
     zip_ref = zipfile.ZipFile(self.path + '/' + self.fileName, 'r')
-    zip_ref.extractall(targetPath)
+    
+    for name in zip_ref.namelist():
+        zip_ref.extract(name, targetPath)
+        self.csvName = name
+    
+    #zip_ref.extractall(targetPath)
     zip_ref.close()
     if os.path.exists(targetPath + '/' + self.fileName ):
         os.remove(targetPath + '/' + self.fileName)
         self.status = "ZIP_EXTRACTED"
+        self.statusMsg = "ZIP content successfully extracted : " + self.fileName
     else:
         print("The file " + targetPath + "/" + self.fileName + " does not exist")
         self.status = "ZIP_FAILED"
+        self.statusMsg = "something went wrong during unzip"
     print(self.status)
 
 #**************** END CLASS *****************
@@ -322,3 +340,33 @@ class ZFile:
 #****************************************
 
 
+#**************** CLASS *****************
+#            pz Settings
+#****************************************
+
+
+
+#**************** END CLASS *****************
+#            pz Settings
+#********************************************
+
+class pzSettings:
+  def __init__(self):
+    self.checkOK = False
+    self.load()
+
+  def load(self):
+    data_folder = Path("BillingPreview/settings/")
+    file_to_open = data_folder / "settings.json"
+  
+    try:
+        with open(file_to_open) as json_file:  
+            data = json.load(json_file)            
+            self.tempFolderPath =  data['settings']['tempFolderPath']
+            print('tempFolderPath: ' + data['settings']['tempFolderPath'])
+            self.resultsFolderPath =  data['settings']['resultsFolderPath']
+            print('resultsFolderPath: ' + data['settings']['resultsFolderPath'])
+        self.checkOK = True
+    except:
+        print(os.getcwd())
+        self.checkOK = False

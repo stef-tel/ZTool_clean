@@ -1,0 +1,8 @@
+#!C:\Users\sesa236189\OneDrive - Schneider Electric\Documents\Perso\pop-it\Projects\Zuora\ZTool_clean\ZTool_clean\test env. virt\Scripts\python.exe
+
+# We should have absolute imports here
+from tld.commands.update_tld_names import main
+
+
+if __name__ == "__main__":
+    main()
